@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView, Platform, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
+import { parseISO } from 'date-fns';
+import { format } from 'date-fns-tz';
+import { ptBR } from 'date-fns/locale';
 
+import api from '../../services';
 import { base_url } from '../../services/1net';
 
 import Zoom from './zoom';
 import Container from '../../components/Container';
 
 import {
-    Content, Header, Icon, HeaderLabel, Contracts, Contract, Description, Img
+    Content, Header, Icon, HeaderLabel, Contracts, Contract, Description, Img, Info, ContentInfo, Label, Value, Espace
 } from './styles';
 
 const MoreInfo = () => {
@@ -17,13 +22,44 @@ const MoreInfo = () => {
     const navigation = useNavigation();
     const router = useRoute();
     const [fullInfo, setFullInfo] = useState({});
-    const [token, setToken] = useState('');
     const [viewZoom, setViewZoom] = useState(false);
+    const [isContract, setIsContract] = useState(false);
+    const [token, setToken] = useState('');
 
     useEffect(() => {
         setFullInfo(router.params.info);
-        setToken(router.params.token);
+
+        if(router.params.info.contract) {
+            setIsContract(true);
+        }
     },[]);
+
+    useEffect(() => {
+        const getCompany = async() => {
+            const getToken = await AsyncStorage.getItem('loginToken');
+
+            if(getToken) {
+                setToken(getToken);
+            }
+
+            try {
+                const response = await api.get(`/company/${fullInfo.CNPJCLIENTE}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                setFullInfo({
+                    ...fullInfo,
+                    company: response.data.Empresa
+                });
+            } catch(err) {
+                console.log('ERRO: ', err);
+            }
+        }
+
+        getCompany();
+    }, [isContract]);
 
     const goBack = () => {
         viewZoom ? setViewZoom(viewZoom => !viewZoom) : navigation.goBack();
@@ -40,7 +76,7 @@ const MoreInfo = () => {
                     <Icon onPress={() => goBack()}>
                         <AntDesign name="arrowleft" size={24} color="#fff" />
                     </Icon>
-                    <HeaderLabel>{fullInfo.eventname}</HeaderLabel>
+                    <HeaderLabel>{isContract ? fullInfo.CODCONTRATO : fullInfo.eventname}</HeaderLabel>
                 </Header>
                 <ScrollView>
                     <Contracts viewZoom={viewZoom}
@@ -48,26 +84,82 @@ const MoreInfo = () => {
                             paddingTop: 16,
                         }}
                     >
-                        <Contract viewZoom={viewZoom}>
-                            { !viewZoom
-                                ?   <>
-                                        <TouchableOpacity onPress={() => showZoom()}>
-                                            <Img
-                                                resizeMode="contain"
-                                                source={{
-                                                    uri: `${base_url}/files/${fullInfo.filename}` ,
-                                                    headers: {
-                                                        Authorization: `Bearer ${token}`,
-                                                    },
-                                                }}
-                                            />
-                                        </TouchableOpacity>
-                                        <Description>{fullInfo.eventdescription}</Description>
-                                    </>
-                                :
-                                    <Zoom Uri={`${base_url}/files/${fullInfo.filename}`} Token={router.params.token} />
-                            }
-                        </Contract>
+                        {   !isContract
+                            ?   <Contract viewZoom={viewZoom}>
+                                    { !viewZoom
+                                        ?   <>
+                                                <TouchableOpacity onPress={() => showZoom()}>
+                                                    <Img
+                                                        resizeMode="contain"
+                                                        source={{
+                                                            uri: `${base_url}/files/${fullInfo.filename}`,
+                                                        }}
+                                                    />
+                                                </TouchableOpacity>
+                                                <Description>{fullInfo.eventdescription}</Description>
+                                            </>
+                                        :
+                                            <Zoom Uri={`${base_url}/files/${fullInfo.filename}`} Token={router.params.token} />
+                                    }
+                                </Contract>
+                            :   <Contract>
+                                    <Espace />
+                                    <Label>cliente:
+                                        <Value>{' '}{fullInfo.company ? fullInfo.company : fullInfo.CNPJCLIENTE}</Value>
+                                    </Label>
+                                    <Espace />
+                                    <Label>Contrato:
+                                        <Value>
+                                            {format(parseISO(fullInfo.DATACONTRATO),
+                                                " dd 'de' MMMM 'de' yyyy'",{
+                                                    locale: ptBR
+                                                }
+                                            )}
+                                        </Value>
+                                    </Label>
+                                    <Label>Início:
+                                        <Value>
+                                            {format(parseISO(fullInfo.DATAINICIO),
+                                                " dd 'de' MMMM 'de' yyyy'",{
+                                                    locale: ptBR
+                                                }
+                                            )}
+                                        </Value>
+                                    </Label>
+                                    <Espace />
+                                    <Label>Carência:
+                                            <Value>{' '}{fullInfo.QTDMESESCARENCIA}{' meses'}</Value>
+                                    </Label>
+                                    <Espace />
+                                    <Espace />
+                                    <Info>
+                                        <ContentInfo>
+                                            <Label>Valor</Label>
+                                            <Value>R$ {fullInfo.VALORCONTRATO}</Value>
+                                        </ContentInfo>
+                                        <ContentInfo>
+                                            <Label>Aditivo</Label>
+                                            <Value>R$ {fullInfo.VALORADITIVO}</Value>
+                                        </ContentInfo>
+                                        <ContentInfo>
+                                            <Label>Total</Label>
+                                            <Value>R$ {fullInfo.VALORTOTAL}</Value>
+                                        </ContentInfo>
+                                    </Info>
+                                    <Espace />
+                                    <Espace />
+                                    <Label>Indicador:
+                                        <Value>{' '}{fullInfo.CNPJINDICADOR}</Value>
+                                    </Label>
+                                    <Espace />
+                                    <Espace />
+                                    <Label>
+                                        Obs:{' '}
+                                        <Value>{fullInfo.OBS}</Value>
+                                    </Label>
+                                    <Espace />
+                                </Contract>
+                        }
                     </Contracts>
                 </ScrollView>
             </Content>

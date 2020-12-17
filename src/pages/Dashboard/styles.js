@@ -141,13 +141,13 @@ export const Title = styled.Text`
 export const ContractTitle = styled.Text`
     font-size: 14px;
     color: #79CB39;
-    margin: 0 0 1px 5px;
+    margin: 0 0 0 5px;
     font-weight: 700;
     text-decoration: underline;
     text-decoration-color: #79CB39;
 `;
 
-export const Contract = styled.View`
+export const Contract = styled.TouchableOpacity`
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
@@ -165,15 +165,23 @@ export const Name = styled.Text`
 
 export const Description = styled.View``;
 
-export const State = styled.View`
-    background: ${props => (props.state === "aprovado" ? "#79CB39" : props.state === "cancelado" ? "#e61919" : "#e5e619")};
-    border-radius: 15px;
-    width: 30px;
-    height: 30px;
-`;
-
 export const Date = styled.Text`
     color: #41484A;
     font-size: 14px;
     margin: 5px 0 0;
 `;
+
+export const State = styled.View`
+    background: #79CB39;
+    border-radius: 10px;
+    padding: 5px 10px;
+    align-items: center;
+    justify-content: center;
+`;
+
+export const LabelState = styled.Text`
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+`;
+

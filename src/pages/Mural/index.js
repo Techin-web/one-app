@@ -52,7 +52,6 @@ const Mural = () => {
     const goMoreInfo = (moreInformations) => {
         navigation.navigate('More', {
             info: moreInformations,
-            token: token,
         });
     }
 
@@ -74,9 +73,7 @@ const Mural = () => {
                                     <Name>{mural.eventname}</Name>
                                     <Date>
                                         {format(parseISO(mural.createdAt),
-                                            "'Dia' dd 'de' MMMM'", {
-                                                timeZone: 'America/Sao_Paulo',
-                                            },{
+                                            "dd 'de' MMMM 'de' yyyy",{
                                                 locale: ptBR
                                             }
                                         )}

@@ -4,57 +4,56 @@ import { Platform } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { parseISO } from 'date-fns';
+import { format } from 'date-fns-tz';
+import { ptBR } from 'date-fns/locale';
+
+import api from '../../services';
 
 import Container from '../../components/Container';
 
 import {
         Content, ContentHeader, Header, Icon, HeaderLabel, Ball, Banner, BannerLabel, Graphic, MoreInfo, Label, ContentValue, Currency,
-        Value, GraphicCurrency, GraphicGoal, Cards, Card, CardTitle, Contracts, Title, ContractTitle, Contract, Name, Description, State,
-        Date
+        Value, GraphicCurrency, GraphicGoal, Cards, Card, CardTitle, Contracts, Title, ContractTitle, Contract, Name, Description, Date,
+        State, LabelState
 } from './styles';
-
-const allContracts = [
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aprovado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'cancelado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aguardando'
-    },{
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aprovado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'cancelado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aguardando'
-    },
-]
 
 const Dashboard = () => {
     const metaAtual = 13000;
     const valorAtual = 3000;
 
     const isIos = Platform.OS === 'ios' ? true : false;
+    const navigation = useNavigation();
+    const [constracts, setContracts] = useState([]);
     const [goalHeight, setGoalHeight] = useState(0); //META
     const [currencyHeight, setCurrencyHeight] = useState(0); //ATUAL
     const [userName, setUserName] = useState('');
+    const [token, setToken] = useState('');
     const windowHeight = Dimensions.get('window').height;
-    const navigation = useNavigation();
+
+    useEffect(() => {
+        const getContracts = async() => {
+            const getToken = await AsyncStorage.getItem('loginToken');
+
+            if(getToken) {
+                setToken(getToken);
+            }
+
+            try {
+                const response = await api.get('/contracts', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                setContracts(response.data.Contracts);
+            } catch(err) {
+
+            }
+        }
+
+        getContracts();
+    }, [token]);
 
     useEffect(() => {
         const getUserName = async() => {
@@ -90,6 +89,15 @@ const Dashboard = () => {
 
     const goContracts = () => {
         navigation.navigate('Contracts');
+    }
+
+    const goContractInfo = (contract) => {
+        navigation.navigate('More', {
+            info: {
+                ...contract,
+                contract: true,
+            }
+        });
     }
 
     return (
@@ -148,18 +156,26 @@ const Dashboard = () => {
                     <Header>
                         <Title>Contratos</Title>
                         <Icon onPress={() => goContracts()}>
-                            <FontAwesome name='filter' size={22} color='#C4C4C4' />
-                            <ContractTitle>Filtrar</ContractTitle>
+                            <FontAwesome name='eye' size={22} color='#41484A' />
+                            <ContractTitle>Ver Todos</ContractTitle>
                         </Icon>
                     </Header>
                     {
-                        allContracts.map((contract, index) => (
-                            <Contract key={index}>
+                        constracts.map((contract, index) => (
+                            <Contract key={index} onPress={() => goContractInfo(contract)}>
                                 <Description>
-                                    <Name>{contract.name}</Name>
-                                    <Date>{contract.date}</Date>
+                                    <Name>Código: {contract.CODCONTRATO}</Name>
+                                    <Date>Data:
+                                        {format(parseISO(contract.DATAINICIO),
+                                            " dd 'de' MMMM 'de' yyyy'",{
+                                                locale: ptBR
+                                            }
+                                        )}
+                                    </Date>
                                 </Description>
-                                <State state={contract.state} />
+                                <State>
+                                    <LabelState>Ativo</LabelState>
+                                </State>
                             </Contract>
                         ))
                     }

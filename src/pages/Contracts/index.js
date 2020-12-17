@@ -1,84 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import { parseISO } from 'date-fns';
+import { format } from 'date-fns-tz';
+import { ptBR } from 'date-fns/locale';
+
+import api from '../../services';
 
 import Container from '../../components/Container';
 
 import {
-        Content, Header, Icon, HeaderLabel, ContentHeader, Title, IconContent, ContractTitle, AllContracts, Contract, Name, Description, State,
-        Date
+        Content, Header, Icon, HeaderLabel, ContentHeader, Title, IconContent, ContractTitle, AllContracts, Contract, Name, Description, Date,
+        State, LabelState
 } from './styles';
-
-const allContracts = [
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aprovado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'cancelado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aguardando'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aprovado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'cancelado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aguardando'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aprovado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'cancelado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aguardando'
-    },{
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aprovado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'cancelado'
-    },
-    {
-        name: 'Edifício Terra Brasílis',
-        date: '12/09/2020',
-        state: 'aguardando'
-    },
-]
-
 
 const Contracts = () => {
     const isIos = Platform.OS === 'ios' ? true : false;
     const navigation = useNavigation();
+    const [constracts, setContracts] = useState([]);
+    const [token, setToken] = useState('');
+
+    useEffect(() => {
+        const getContracts = async() => {
+            const getToken = await AsyncStorage.getItem('loginToken');
+
+            if(getToken) {
+                setToken(getToken);
+            }
+
+            try {
+                const response = await api.get('/all/contracts', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                setContracts(response.data.Contracts);
+            } catch(err) {
+
+            }
+        }
+
+        getContracts();
+    }, [token]);
 
     const goBack = () => {
         navigation.goBack();
+    }
+
+    const goContractInfo = (contract) => {
+        navigation.navigate('More', {
+            info: {
+                ...contract,
+                contract: true,
+            }
+        });
     }
 
     return (
@@ -93,20 +71,40 @@ const Contracts = () => {
                 <ContentHeader>
                     <Title>Filtro</Title>
                     <IconContent onPress={() => {}}>
-                        <FontAwesome name='filter' size={22} color='#C4C4C4' />
+                        <FontAwesome name='filter' size={22} color='#41484A' />
                         <ContractTitle>Filtrar</ContractTitle>
                     </IconContent>
                 </ContentHeader>
                 <ScrollView>
                     <AllContracts>
                         {
-                            allContracts.map((contract, index) => (
-                                <Contract key={index} onPress={() => {}}>
+                            constracts.map((contract, index) => (
+                                <Contract key={index} onPress={() => goContractInfo(contract)}>
                                     <Description>
-                                        <Name>{contract.name}</Name>
-                                        <Date>{contract.date}</Date>
+                                        <Name>Código: {contract.CODCONTRATO}</Name>
+                                        <Date>Data:
+                                            {format(parseISO(contract.DATAINICIO),
+                                                " dd 'de' MMMM 'de' yyyy'",{
+                                                    locale: ptBR
+                                                }
+                                            )}
+                                        </Date>
                                     </Description>
-                                    <State state={contract.state} />
+                                    <State cod={contract.CODSITUACAO}>
+                                        <LabelState>{
+                                            ((contract.CODSITUACAO === 2001) || (contract.CODSITUACAO === 3001))
+                                            ?   'Cancelado'
+                                            :   ((contract.CODSITUACAO === 1001) || (contract.CODSITUACAO === 4001))
+                                            ?   'Ativo'
+                                            :   ((contract.CODSITUACAO === 5001) || (contract.CODSITUACAO === 8001))
+                                            ?   'Suspenso'
+                                            :   contract.CODSITUACAO === 6001
+                                            ?   'Jurídico'
+                                            :   contract.CODSITUACAO === 7001
+                                            ?   'Concluido'
+                                            :   'Sem Status'
+                                        }</LabelState>
+                                    </State>
                                 </Contract>
                             ))
                         }

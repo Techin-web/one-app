@@ -79,15 +79,32 @@ export const Name = styled.Text`
 
 export const Description = styled.View``;
 
-export const State = styled.View`
-    background: ${props => (props.state === "aprovado" ? "#79CB39" : props.state === "cancelado" ? "#e61919" : "#e5e619")};
-    border-radius: 15px;
-    width: 30px;
-    height: 30px;
-`;
-
 export const Date = styled.Text`
     color: #41484A;
     font-size: 14px;
     margin: 5px 0 0;
+`;
+
+export const State = styled.View`
+    background: ${props => (
+        ((props.cod === 1001) || (props.cod === 4001))
+        ? "#79CB39"
+        : ((props.cod === 2001) || (props.cod === 3001))
+        ? "#e61919"
+        : ((props.cod === 5001) || (props.cod === 8001))
+        ? "#e5e619"
+        : ((props.cod === 6001) || (props.cod === 7001))
+        ? "#000"
+        : "#eee"
+    )};
+    border-radius: 10px;
+    padding: 5px 10px;
+    align-items: center;
+    justify-content: center;
+`;
+
+export const LabelState = styled.Text`
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
 `;

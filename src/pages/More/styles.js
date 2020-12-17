@@ -38,6 +38,7 @@ export const Contract = styled.View`
     background: #fff;
     border-radius: ${props => (props.viewZoom ? '0' : '10px')};
     margin-top: ${props => (props.viewZoom ? '-16px' : '0')};
+    justify-content: space-around;
 `;
 
 export const Description = styled.Text`
@@ -58,4 +59,31 @@ export const Img = styled.Image`
     height: 250px;
     width: 100%;
     margin-top: 20px;
+`;
+
+export const Info = styled.View`
+    flex-direction: row;
+    justify-content: space-around;
+`;
+
+export const ContentInfo = styled.View`
+    justify-content: center;
+    align-items: center;
+`;
+
+export const Label = styled.Text`
+    font-size: 16px;
+    color: #41484A;
+    margin: 5px 0 0;
+    text-align: justify;
+`;
+
+export const Value = styled.Text`
+    font-size: 18px;
+    font-weight: 700;
+    color: #41484A;
+`;
+
+export const Espace = styled.View`
+    margin: 5px 0;
 `;
