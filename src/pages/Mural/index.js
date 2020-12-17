@@ -42,7 +42,9 @@ const Mural = () => {
 
                 setAllMurals(response.data);
             } catch(err) {
-                console.log(err);
+                console.log('ERRO: ', err);
+
+                //COLOLAR MODAL QUE NÃO ENCONTROU DADOS DO MURAL
             }
         }
 

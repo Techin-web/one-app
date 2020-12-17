@@ -39,7 +39,9 @@ const Contracts = () => {
 
                 setContracts(response.data.Contracts);
             } catch(err) {
+                console.log('ERRO: ', err);
 
+                //COLOLAR MODAL QUE NÃO ENCONTROU OS CONTRATOS
             }
         }
 

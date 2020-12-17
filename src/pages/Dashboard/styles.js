@@ -141,10 +141,8 @@ export const Title = styled.Text`
 export const ContractTitle = styled.Text`
     font-size: 14px;
     color: #79CB39;
-    margin: 0 0 0 5px;
+    margin: 1px 0 0 5px;
     font-weight: 700;
-    text-decoration: underline;
-    text-decoration-color: #79CB39;
 `;
 
 export const Contract = styled.TouchableOpacity`
@@ -180,8 +178,10 @@ export const State = styled.View`
 `;
 
 export const LabelState = styled.Text`
+    font-size: 14px;
     color: #fff;
     font-weight: 700;
     text-align: center;
+    text-transform: uppercase;
 `;
 

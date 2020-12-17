@@ -52,9 +52,9 @@ const SignIn = () => {
 
             loginSuccess();
         } catch(err) {
-            setModalVisible(true);
-
             console.log('ERRO: ', err);
+
+            setModalVisible(true);
         }
     }
 

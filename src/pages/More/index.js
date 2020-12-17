@@ -14,7 +14,7 @@ import Zoom from './zoom';
 import Container from '../../components/Container';
 
 import {
-    Content, Header, Icon, HeaderLabel, Contracts, Contract, Description, Img, Info, ContentInfo, Label, Value, Espace
+    Content, Header, Icon, HeaderLabel, Contracts, Contract, Description, Img, Info, ContentInfo, Label, Value, Espace, State, LabelState
 } from './styles';
 
 const MoreInfo = () => {
@@ -43,7 +43,7 @@ const MoreInfo = () => {
             }
 
             try {
-                const response = await api.get(`/company/${fullInfo.CNPJCLIENTE}`, {
+                const response = await api.get(`/company/${fullInfo.CODPROSPECCAO}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -58,8 +58,8 @@ const MoreInfo = () => {
             }
         }
 
-        getCompany();
-    }, [isContract]);
+        isContract && getCompany();
+    }, [token, fullInfo]);
 
     const goBack = () => {
         viewZoom ? setViewZoom(viewZoom => !viewZoom) : navigation.goBack();
@@ -158,6 +158,21 @@ const MoreInfo = () => {
                                         <Value>{fullInfo.OBS}</Value>
                                     </Label>
                                     <Espace />
+                                    <State cod={fullInfo.CODSITUACAO}>
+                                        <LabelState>{
+                                            ((fullInfo.CODSITUACAO === 2001) || (fullInfo.CODSITUACAO === 3001))
+                                            ?   'Cancelado'
+                                            :   ((fullInfo.CODSITUACAO === 1001) || (fullInfo.CODSITUACAO === 4001))
+                                            ?   'Ativo'
+                                            :   ((fullInfo.CODSITUACAO === 5001) || (fullInfo.CODSITUACAO === 8001))
+                                            ?   'Suspenso'
+                                            :   fullInfo.CODSITUACAO === 6001
+                                            ?   'Jurídico'
+                                            :   fullInfo.CODSITUACAO === 7001
+                                            ?   'Concluido'
+                                            :   'Sem Status'
+                                        }</LabelState>
+                                    </State>
                                 </Contract>
                         }
                     </Contracts>

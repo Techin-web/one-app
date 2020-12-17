@@ -87,3 +87,31 @@ export const Value = styled.Text`
 export const Espace = styled.View`
     margin: 5px 0;
 `;
+
+export const State = styled.View`
+    flex: 1;
+    background: ${props => (
+        ((props.cod === 1001) || (props.cod === 4001))
+        ? "#79CB39"
+        : ((props.cod === 2001) || (props.cod === 3001))
+        ? "#e61919"
+        : ((props.cod === 5001) || (props.cod === 8001))
+        ? "#e5e619"
+        : ((props.cod === 6001) || (props.cod === 7001))
+        ? "#000"
+        : "#eee"
+    )};
+    border-radius: 10px;
+    padding: 5px 10px;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0 0;
+`;
+
+export const LabelState = styled.Text`
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+`;

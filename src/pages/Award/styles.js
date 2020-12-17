@@ -67,7 +67,7 @@ export const Value = styled.Text`
 
 export const Card = styled.View`
     background: ${props => (props.pago ? "#79CB39" : "#FF9900")};
-    padding: 10px 16px;
+    padding: 5px 10px;
     border-radius: 10px;
 `;
 
