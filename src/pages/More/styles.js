@@ -29,11 +29,11 @@ export const HeaderLabel = styled.Text`
     color: #fff;
 `;
 
-export const Contracts = styled.ScrollView`
+export const FullContent = styled.ScrollView`
     padding: ${props => (props.viewZoom ? '0' : '0 16px')};
 `;
 
-export const Contract = styled.View`
+export const Infos = styled.View`
     padding: ${props => (props.viewZoom ? '0' : '0 16px 16px')};
     background: #fff;
     border-radius: ${props => (props.viewZoom ? '0' : '10px')};
@@ -91,11 +91,11 @@ export const Espace = styled.View`
 export const State = styled.View`
     flex: 1;
     background: ${props => (
-        ((props.cod === 1001) || (props.cod === 4001))
+        ((props.cod === 1001) || (props.cod === 4001) || (props.cod === 2))
         ? "#79CB39"
-        : ((props.cod === 2001) || (props.cod === 3001))
+        : ((props.cod === 2001) || (props.cod === 3001) || (props.cod === 3))
         ? "#e61919"
-        : ((props.cod === 5001) || (props.cod === 8001))
+        : ((props.cod === 5001) || (props.cod === 8001) || (props.cod === 1))
         ? "#e5e619"
         : ((props.cod === 6001) || (props.cod === 7001))
         ? "#000"

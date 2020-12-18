@@ -14,7 +14,7 @@ import Zoom from './zoom';
 import Container from '../../components/Container';
 
 import {
-    Content, Header, Icon, HeaderLabel, Contracts, Contract, Description, Img, Info, ContentInfo, Label, Value, Espace, State, LabelState
+    Content, Header, Icon, HeaderLabel, FullContent, Infos, Description, Img, Info, ContentInfo, Label, Value, Espace, State, LabelState
 } from './styles';
 
 const MoreInfo = () => {
@@ -24,12 +24,19 @@ const MoreInfo = () => {
     const [fullInfo, setFullInfo] = useState({});
     const [viewZoom, setViewZoom] = useState(false);
     const [isContract, setIsContract] = useState(false);
+    const [isProspection, setIsProspection] = useState(false);
     const [token, setToken] = useState('');
 
     useEffect(() => {
         setFullInfo(router.params.info);
 
+        if(router.params.info.prospection) {
+            setIsProspection(true);
+            setIsContract(false);
+        }
+
         if(router.params.info.contract) {
+            setIsProspection(false);
             setIsContract(true);
         }
     },[]);
@@ -76,35 +83,18 @@ const MoreInfo = () => {
                     <Icon onPress={() => goBack()}>
                         <AntDesign name="arrowleft" size={24} color="#fff" />
                     </Icon>
-                    <HeaderLabel>{isContract ? fullInfo.CODCONTRATO : fullInfo.eventname}</HeaderLabel>
+                    <HeaderLabel>{isContract ? fullInfo.CODCONTRATO : isProspection ? fullInfo.CODPROSPECCAO : fullInfo.eventname}</HeaderLabel>
                 </Header>
                 <ScrollView>
-                    <Contracts viewZoom={viewZoom}
+                    <FullContent viewZoom={viewZoom}
                         contentContainerStyle={{
                             paddingTop: 16,
                         }}
                     >
-                        {   !isContract
-                            ?   <Contract viewZoom={viewZoom}>
-                                    { !viewZoom
-                                        ?   <>
-                                                <TouchableOpacity onPress={() => showZoom()}>
-                                                    <Img
-                                                        resizeMode="contain"
-                                                        source={{
-                                                            uri: `${base_url}/files/${fullInfo.filename}`,
-                                                        }}
-                                                    />
-                                                </TouchableOpacity>
-                                                <Description>{fullInfo.eventdescription}</Description>
-                                            </>
-                                        :
-                                            <Zoom Uri={`${base_url}/files/${fullInfo.filename}`} Token={router.params.token} />
-                                    }
-                                </Contract>
-                            :   <Contract>
+                        {   isContract
+                            ?   <Infos>
                                     <Espace />
-                                    <Label>cliente:
+                                    <Label>Cliente:
                                         <Value>{' '}{fullInfo.company ? fullInfo.company : fullInfo.CNPJCLIENTE}</Value>
                                     </Label>
                                     <Espace />
@@ -173,9 +163,82 @@ const MoreInfo = () => {
                                             :   'Sem Status'
                                         }</LabelState>
                                     </State>
-                                </Contract>
+                                </Infos>
+
+                            :   isProspection
+                            ?   <Infos>
+                                    <Espace />
+                                    <Label>Cliente:
+                                        <Value>{' '}{fullInfo.EMPRESA}</Value>
+                                    </Label>
+                                    <Espace />
+                                    <Label>Cadastro:
+                                        <Value>
+                                            {format(parseISO(fullInfo.DATACADASTRO),
+                                                " dd 'de' MMMM 'de' yyyy'",{
+                                                    locale: ptBR
+                                                }
+                                            )}
+                                        </Value>
+                                    </Label>
+                                    <Espace />
+                                    <Espace />
+                                    <Info>
+                                        <ContentInfo>
+                                            <Label>Inicial</Label>
+                                            <Value>R$ {fullInfo.VALORINICIAL}</Value>
+                                        </ContentInfo>
+                                        <ContentInfo>
+                                            <Label>Final</Label>
+                                            <Value>R$ {fullInfo.VALORFINAL}</Value>
+                                        </ContentInfo>
+                                        <ContentInfo>
+                                            <Label>Elevadores</Label>
+                                            <Value>{fullInfo.QTDELEVADORES}</Value>
+                                        </ContentInfo>
+                                    </Info>
+                                    <Espace />
+                                    <Espace />
+                                    <Label>
+                                        Obs:{' '}
+                                        <Value>{fullInfo.OBS}</Value>
+                                    </Label>
+                                    <Espace />
+                                    <Espace />
+                                    <State cod={fullInfo.CODSTATUSPROSPECCAO}>
+                                        <LabelState>
+                                            {
+                                                (fullInfo.CODSTATUSPROSPECCAO === 1)
+                                                ?   'Em Digitação'
+                                                :   (fullInfo.CODSTATUSPROSPECCAO === 2)
+                                                ?   'Contrato Gerado'
+                                                :   (fullInfo.CODSTATUSPROSPECCAO === 3)
+                                                ?   'Cliente Desistiu'
+                                                :   'Sem Status'
+                                            }
+                                        </LabelState>
+                                    </State>
+                                </Infos>
+                            :   <Infos viewZoom={viewZoom}>
+                                    { !viewZoom
+                                        ?   <>
+                                                <TouchableOpacity onPress={() => showZoom()}>
+                                                    <Img
+                                                        resizeMode="contain"
+                                                        source={{
+                                                            uri: `${base_url}/files/${fullInfo.filename}`,
+                                                        }}
+                                                    />
+                                                </TouchableOpacity>
+                                                <Description>{fullInfo.eventdescription}</Description>
+                                            </>
+                                        :
+                                            <Zoom Uri={`${base_url}/files/${fullInfo.filename}`} Token={router.params.token} />
+                                    }
+                                </Infos>
+
                         }
-                    </Contracts>
+                    </FullContent>
                 </ScrollView>
             </Content>
         </Container>
